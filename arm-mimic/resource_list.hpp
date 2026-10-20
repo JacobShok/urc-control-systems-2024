@@ -1,9 +1,11 @@
 #pragma once
 
+#include <libhal-actuator/rc_servo.hpp>
 #include <libhal-arm-mcu/system_control.hpp>
 #include <libhal-util/steady_clock.hpp>
 #include <libhal/adc.hpp>
 #include <libhal/functional.hpp>
+#include <libhal/i2c.hpp>
 #include <libhal/interrupt_pin.hpp>
 #include <libhal/output_pin.hpp>
 #include <libhal/pointers.hpp>
@@ -14,7 +16,6 @@
 #include <libhal/timer.hpp>
 #include <libhal/usb.hpp>
 #include <libhal/zero_copy_serial.hpp>
-#include <libhal-actuator/rc_servo.hpp>
 
 // Application function must be implemented by one of the compilation units
 // (.cpp) files.
@@ -23,11 +24,13 @@ namespace resources {
 
 hal::v5::strong_ptr<hal::steady_clock> clock();
 hal::v5::strong_ptr<hal::serial> console();
+hal::v5::strong_ptr<hal::i2c> i2c();
 hal::v5::strong_ptr<hal::output_pin> status_led();
 // separate output pin for potentiometer feedback - analog read
 hal::v5::strong_ptr<hal::adc> a0_feedback_adc();
 // define a pwm channel servo input
 hal::v5::strong_ptr<hal::pwm16_channel> cipo1_pwm_channel();
+hal::actuator::rc_servo16::settings rc_servo_settings();
 hal::v5::strong_ptr<hal::actuator::rc_servo16> rc_servo();
 
 // void stop();
