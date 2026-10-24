@@ -1,13 +1,9 @@
 #pragma once
 
 #include "../../drivers/include/drv8825.hpp"
-// #include "../../drivers/include/soil_sensor_sht21.hpp"
-#include <cmath>
 #include <libhal-actuator/smart_servo/rmd/drc_v2.hpp>
-// #include <libhal-actuator/smart_servo/rmd/mc_x_v2.hpp> not used anymore
 #include <libhal/pointers.hpp>
 #include <libhal/serial.hpp>
-// #include <libhal/servo.hpp>
 #include <libhal/steady_clock.hpp>
 #include <libhal/units.hpp>
 

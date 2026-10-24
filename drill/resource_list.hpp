@@ -24,8 +24,7 @@
 #include <libhal/timer.hpp>
 #include <libhal/usb.hpp>
 #include <libhal/zero_copy_serial.hpp>
-// have to include reletive path for drv8825 cause i broke the hal:: generic convention below, 
-// better for memmory manegment, but adds some bloat, could also make drill class just take in a drv8825 object instead like before
+// have to include reletive path for drv8825
 #include <../../drivers/include/drv8825.hpp>
 
 // Application function must be implemented by one of the compilation units

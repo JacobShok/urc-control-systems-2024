@@ -1,11 +1,9 @@
 
 #include "../../drivers/include/drv8825.hpp"
-//#include "../../drivers/include/soil_sensor_sht21.hpp"
 #include "implementation.hpp"
 #include <../resource_list.hpp>
 #include <cstdint>
 #include <exception>
-//#include <libhal-actuator/smart_servo/rmd/mc_x_v2.hpp>
 #include <libhal-exceptions/control.hpp>
 #include <libhal-util/bit_bang_i2c.hpp>
 #include <libhal-util/serial.hpp>
@@ -28,20 +26,6 @@ void application()
     auto clock = resources::clock();
     hal::print(*terminal, "Clock...\n\n");
 
-    /*
-    auto dir_pin = resources::dir_pin();
-    hal::print(*terminal, " dir pin \n");
-    auto step_pin = resources::step_pin();
-    hal::print(*terminal, "step pin \n");
-    auto m1_pin = resources::m1_pin();
-    hal::print(*terminal, " m1 pin \n");
-    auto m2_pin = resources::m2_pin();
-    hal::print(*terminal, " m2 pin \n");
-
-    auto m0_pin = resources::m0_pin();
-    hal::print(*terminal, " m0 pin \n");
-    */
-    
     auto enbl = resources::enbl();
     hal::print(*terminal, " enbl \n");
 
@@ -66,7 +50,6 @@ void application()
 
 
     drill_class drill(drill_motor,
-                      //clock,
                       stepper_controller);  // add , m_sht21 when i2c works
 
     while (true) {

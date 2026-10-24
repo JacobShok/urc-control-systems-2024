@@ -374,7 +374,7 @@ hal::v5::strong_ptr<sjsu::drivers::drv8825> stepper()
         .steady_clock = clk,
         .motor_step_factor = sjsu::drivers::drv8825::step_factor::one,
         .full_steps_per_rotation = 2048,
-        .step_half_period = hal::time_duration(100000), // hal::time_duration(100000) cause 100_us was giving problems
+        .step_half_period = hal::time_duration(100000), // using hal::time_duration(100000), 100_us was giving problems
         .mode_pins = { m0, m1, m2 },
       });
     }
