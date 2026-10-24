@@ -1,13 +1,13 @@
 #pragma once
 
 #include "../../drivers/include/drv8825.hpp"
-#include "../../drivers/include/soil_sensor_sht21.hpp"
+// #include "../../drivers/include/soil_sensor_sht21.hpp"
 #include <cmath>
 #include <libhal-actuator/smart_servo/rmd/drc_v2.hpp>
-#include <libhal-actuator/smart_servo/rmd/mc_x_v2.hpp>
+// #include <libhal-actuator/smart_servo/rmd/mc_x_v2.hpp> not used anymore
 #include <libhal/pointers.hpp>
 #include <libhal/serial.hpp>
-#include <libhal/servo.hpp>
+// #include <libhal/servo.hpp>
 #include <libhal/steady_clock.hpp>
 #include <libhal/units.hpp>
 
@@ -16,24 +16,19 @@ class drill_class
 {
 public:
   drill_class(
-
-    hal::v5::strong_ptr<hal::actuator::rmd_mc_x_v2> motor,
-    hal::v5::strong_ptr<hal::steady_clock> clock,
-    sjsu::drivers::drv8825 step_motor_driver
-    // sjsu::drivers::sht21 soil_sensor
-
+    hal::v5::strong_ptr<hal::actuator::rmd_drc_v2> p_motor,
+    hal::v5::strong_ptr<sjsu::drivers::drv8825> p_stepper_driver
   );
 
-  // void stop();
-
   void spin_drill();
-  void set_stepper(long steps);
-  // rf
+  hal::rpm get_drill_speed();
 
+  void set_stepper(long steps);
+  long get_position();
+
+  void stop();
 private:
-  hal::v5::strong_ptr<hal::actuator::rmd_mc_x_v2> m_drill;
-  hal::v5::strong_ptr<hal::steady_clock> m_clock;
-  sjsu::drivers::drv8825 m_stepper_driver;
-  // sjsu::drivers::sht21 m_soil_sensor;
+  hal::v5::strong_ptr<hal::actuator::rmd_drc_v2> m_motor;
+  hal::v5::strong_ptr<sjsu::drivers::drv8825> m_stepper_driver;
 };
 }  // namespace sjsu::drill

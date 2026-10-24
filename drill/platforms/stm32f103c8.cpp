@@ -324,8 +324,8 @@ hal::v5::strong_ptr<hal::can_identifier_filter> can_identifier_filter()
 }
 
 constexpr uint16_t drill_id = 0x141;
-hal::v5::optional_ptr<hal::actuator::rmd_mc_x_v2> drill_ptr;
-hal::v5::strong_ptr<hal::actuator::rmd_mc_x_v2> drill_motor()
+hal::v5::optional_ptr<hal::actuator::rmd_drc_v2> drill_ptr;
+hal::v5::strong_ptr<hal::actuator::rmd_drc_v2> drill_motor()
 {
   auto console_ref = console();
 
@@ -340,7 +340,7 @@ hal::v5::strong_ptr<hal::actuator::rmd_mc_x_v2> drill_motor()
     hal::print(*console_ref, "clock initialized \n");
 
     drill_ptr =
-      hal::v5::make_strong_ptr<hal::actuator::rmd_mc_x_v2>(driver_allocator(),
+      hal::v5::make_strong_ptr<hal::actuator::rmd_drc_v2>(driver_allocator(),
                                                            *transceiver,
                                                            *identifier_filter,
                                                            *clock_ref,
@@ -355,6 +355,31 @@ hal::v5::strong_ptr<hal::actuator::rmd_mc_x_v2> drill_motor()
 }
 
 // added from drive ABOVE
+
+hal::v5::optional_ptr<sjsu::drivers::drv8825> stepper_ptr;
+hal::v5::strong_ptr<sjsu::drivers::drv8825> stepper()
+ {
+    if (not stepper_ptr) {
+    auto dir = dir_pin();
+    auto step = step_pin();
+    auto clk = clock();
+    auto m0 = m0_pin();
+    auto m1 = m1_pin();
+    auto m2 = m2_pin();
+    stepper_ptr = hal::v5::make_strong_ptr<sjsu::drivers::drv8825>(
+      driver_allocator(),
+      sjsu::drivers::drv8825::ctor_params{
+        .direction_pin = dir,
+        .step_pin = step,
+        .steady_clock = clk,
+        .motor_step_factor = sjsu::drivers::drv8825::step_factor::one,
+        .full_steps_per_rotation = 2048,
+        .step_half_period = hal::time_duration(100000), // hal::time_duration(100000) cause 100_us was giving problems
+        .mode_pins = { m0, m1, m2 },
+      });
+    }
+  return stepper_ptr;
+}
 
 [[noreturn]] void terminate_handler() noexcept
 {

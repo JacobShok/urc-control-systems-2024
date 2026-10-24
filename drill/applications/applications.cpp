@@ -1,11 +1,11 @@
 
 #include "../../drivers/include/drv8825.hpp"
-#include "../../drivers/include/soil_sensor_sht21.hpp"
+//#include "../../drivers/include/soil_sensor_sht21.hpp"
 #include "implementation.hpp"
 #include <../resource_list.hpp>
 #include <cstdint>
 #include <exception>
-#include <libhal-actuator/smart_servo/rmd/mc_x_v2.hpp>
+//#include <libhal-actuator/smart_servo/rmd/mc_x_v2.hpp>
 #include <libhal-exceptions/control.hpp>
 #include <libhal-util/bit_bang_i2c.hpp>
 #include <libhal-util/serial.hpp>
@@ -28,6 +28,7 @@ void application()
     auto clock = resources::clock();
     hal::print(*terminal, "Clock...\n\n");
 
+    /*
     auto dir_pin = resources::dir_pin();
     hal::print(*terminal, " dir pin \n");
     auto step_pin = resources::step_pin();
@@ -39,7 +40,8 @@ void application()
 
     auto m0_pin = resources::m0_pin();
     hal::print(*terminal, " m0 pin \n");
-
+    */
+    
     auto enbl = resources::enbl();
     hal::print(*terminal, " enbl \n");
 
@@ -52,16 +54,7 @@ void application()
 
     hal::print(*terminal, "Motor Initialized...\n\n");
 
-    sjsu::drivers::drv8825 stepper_controller(
-      sjsu::drivers::drv8825::ctor_params{
-        .direction_pin = dir_pin,
-        .step_pin = step_pin,
-        .steady_clock = clock,
-        .motor_step_factor = sjsu::drivers::drv8825::step_factor::one,
-        .full_steps_per_rotation = 2048,
-        .step_half_period = 100us,
-        .mode_pins = { m0_pin, m1_pin, m2_pin },
-      });
+    auto stepper_controller = sjsu::drill::resources::stepper();
 
     hal::print(*terminal, "Stepper Motor Initialized\n\n");
 
@@ -70,18 +63,22 @@ void application()
 
     // sjsu::drivers::sht21 m_sht21 = sjsu::drivers::sht21(i2c);
 
+
+
     drill_class drill(drill_motor,
-                      clock,
+                      //clock,
                       stepper_controller);  // add , m_sht21 when i2c works
 
     while (true) {
       drill.spin_drill();
-      // drill.set_stepper(9600);
+      drill.set_stepper(4800); // prev fed in 9600 i cut it in half to be safe
       // hal::print<64>(*terminal, "dir level going up: %d\n", dir_pin->level());
-      // hal::print<64>(*terminal, "fault level: %d\n", fault->level());
-      // drill.set_stepper(-9600);
+      hal::print<64>(*terminal, "fault level: %d\n", fault->level());
+      hal::delay(*clock, 2s);
+      drill.set_stepper(-4800);
       // hal::print<64>(*terminal, "dir level going down: %d\n", dir_pin->level());
-      // hal::print<64>(*terminal, "fault level: %d\n", fault->level());
+      hal::print<64>(*terminal, "fault level: %d\n", fault->level());
+      hal::delay(*clock, 2s);
     }
   }
 

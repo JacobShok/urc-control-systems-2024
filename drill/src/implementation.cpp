@@ -4,7 +4,6 @@
 #include <cmath>
 #include <cstdlib>
 #include <libhal-actuator/smart_servo/rmd/drc_v2.hpp>
-#include <libhal-actuator/smart_servo/rmd/mc_x_v2.hpp>
 #include <libhal-arm-mcu/stm32f1/can.hpp>
 #include <libhal-arm-mcu/stm32f1/can2.hpp>
 #include <libhal-util/serial.hpp>
@@ -18,26 +17,35 @@ using namespace hal::literals;
 
 namespace sjsu::drill {
 
-drill_class::drill_class(hal::v5::strong_ptr<hal::actuator::rmd_mc_x_v2> motor,
-                         hal::v5::strong_ptr<hal::steady_clock> clock,
-                         sjsu::drivers::drv8825 step_motor_driver
-                         // , sjsu::drivers::sht21 soil_sensor
-                         )
-  : m_drill(motor)
-  , m_clock(clock)
-  , m_stepper_driver(step_motor_driver)
-// , m_soil_sensor(soil_sensor)
+drill_class::drill_class(hal::v5::strong_ptr<hal::actuator::rmd_drc_v2> p_motor,
+                        hal::v5::strong_ptr<sjsu::drivers::drv8825> p_stepper_driver
+                        )
+  : m_motor(std::move(p_motor))
+  , m_stepper_driver(std::move(p_stepper_driver))
 {
+}
+void drill_class::spin_drill()
+{
+  m_motor->velocity_control(20.0_rpm);
+}
+hal::rpm drill_class::get_drill_speed()
+{
+  return m_motor->feedback().speed();
 }
 
 void drill_class::set_stepper(long steps)
 {
-  m_stepper_driver.step(steps);
+  m_stepper_driver->step(steps);
 }
-
-void drill_class::spin_drill()
+// just returning get_partial_steps for now later need to figure out a depth func
+long drill_class::get_position()
 {
-  m_drill->velocity_control(20.0_rpm);
+  return m_stepper_driver->get_partial_steps();
 }
 
+void drill_class::stop()
+{
+  m_motor->velocity_control(0.0_rpm);
+  m_stepper_driver->step(0);
+}
 }  // namespace sjsu::drill
