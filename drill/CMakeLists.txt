@@ -12,7 +12,7 @@ INCLUDES
     include
     ../drivers/include
 SOURCES
-    ./src/implementation.cpp
+    ./src/drill_driver.cpp
     ../drivers/src/soil_sensor_sht21.cpp
     ../drivers/src/drv8825.cpp
 

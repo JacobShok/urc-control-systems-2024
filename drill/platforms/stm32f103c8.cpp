@@ -323,7 +323,7 @@ hal::v5::strong_ptr<hal::can_identifier_filter> can_identifier_filter()
   return hal::acquire_can_identifier_filter(driver_allocator(), can_manager)[0];
 }
 
-constexpr uint16_t drill_id = 0x141;
+constexpr uint16_t drill_id = 0x400;
 hal::v5::optional_ptr<hal::actuator::rmd_drc_v2> drill_ptr;
 hal::v5::strong_ptr<hal::actuator::rmd_drc_v2> drill_motor()
 {
