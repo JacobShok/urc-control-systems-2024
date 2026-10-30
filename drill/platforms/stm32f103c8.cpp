@@ -357,15 +357,18 @@ hal::v5::strong_ptr<hal::actuator::rmd_drc_v2> drill_motor()
 // added from drive ABOVE
 
 hal::v5::optional_ptr<sjsu::drivers::drv8825> stepper_ptr;
+std::optional<hal::v5::strong_ptr<hal::output_pin>> m0_ptr; // kept at file scope so optional_ptr inside drv8825 never dangles
+std::optional<hal::v5::strong_ptr<hal::output_pin>> m1_ptr;
+std::optional<hal::v5::strong_ptr<hal::output_pin>> m2_ptr;
 hal::v5::strong_ptr<sjsu::drivers::drv8825> stepper()
  {
     if (not stepper_ptr) {
     auto dir = dir_pin();
     auto step = step_pin();
     auto clk = clock();
-    auto m0 = m0_pin();
-    auto m1 = m1_pin();
-    auto m2 = m2_pin();
+    m0_ptr = m0_pin();
+    m1_ptr = m1_pin();
+    m2_ptr = m2_pin();
     stepper_ptr = hal::v5::make_strong_ptr<sjsu::drivers::drv8825>(
       driver_allocator(),
       sjsu::drivers::drv8825::ctor_params{
@@ -375,7 +378,7 @@ hal::v5::strong_ptr<sjsu::drivers::drv8825> stepper()
         .motor_step_factor = sjsu::drivers::drv8825::step_factor::one,
         .full_steps_per_rotation = 2048,
         .step_half_period = hal::time_duration(100000), // using hal::time_duration(100000), 100_us was giving problems
-        .mode_pins = { m0, m1, m2 },
+        .mode_pins = { *m0_ptr, *m1_ptr, *m2_ptr },
       });
     }
   return stepper_ptr;

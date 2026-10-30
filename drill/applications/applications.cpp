@@ -57,11 +57,11 @@ void application()
       drill.set_stepper(4800); // prev fed in 9600 i cut it in half to be safe
       // hal::print<64>(*terminal, "dir level going up: %d\n", dir_pin->level());
       hal::print<64>(*terminal, "fault level: %d\n", fault->level());
-      hal::delay(*clock, 2s);
+      hal::delay(*clock, 3s);
       drill.set_stepper(-4800);
       // hal::print<64>(*terminal, "dir level going down: %d\n", dir_pin->level());
       hal::print<64>(*terminal, "fault level: %d\n", fault->level());
-      hal::delay(*clock, 2s);
+      hal::delay(*clock, 3s);
     }
   }
 
