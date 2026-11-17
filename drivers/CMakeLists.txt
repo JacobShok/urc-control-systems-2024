@@ -21,6 +21,7 @@ libhal_build_demos(
 DEMOS
   adc1283_demo
   blinker_demo
+  mp6500_demo
   can_demo
   color_sensor_demo
   h_bridge_demo
@@ -32,8 +33,6 @@ DEMOS
   scd40_demo
   soil_sensor_demo
   tla2528_analog_input_demo
-  serial_commands_demo
-  adc1283_demo
   ultrasonic_sensor_hcsr04_demo
 
 INCLUDES
@@ -41,6 +40,7 @@ INCLUDES
   .
 
 SOURCES
+    src/mp6500.cpp
     src/serial_commands.cpp
     src/color_sensor_opt4048.cpp
     src/mq4.cpp
