@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include "mp6500.hpp"
 #include <chrono>
 #include <libhal-actuator/smart_servo/rmd/drc_v2.hpp>
 #include <libhal-arm-mcu/dwt_counter.hpp>
@@ -147,59 +148,28 @@ hal::v5::strong_ptr<hal::i2c> i2c()
   return i2c_ptr;
 }
 
-hal::v5::strong_ptr<hal::input_pin> input_pin_0()
-{
-  return hal::v5::make_strong_ptr<decltype(gpio_a().acquire_input_pin(0))>(
-    driver_allocator(), gpio_a().acquire_input_pin(0));
-}
-
-hal::v5::strong_ptr<hal::input_pin> input_pin_1()
-{
-  return hal::v5::make_strong_ptr<decltype(gpio_a().acquire_input_pin(15))>(
-    driver_allocator(), gpio_a().acquire_input_pin(15));
-}
-
-hal::v5::strong_ptr<hal::input_pin> fault()
-{
-  return hal::v5::make_strong_ptr<decltype(gpio_b().acquire_input_pin(3))>(
-    driver_allocator(), gpio_b().acquire_input_pin(3));
-}
-
 hal::v5::strong_ptr<hal::output_pin> dir_pin()
 {
-  return hal::v5::make_strong_ptr<decltype(gpio_b().acquire_output_pin(14))>(
-    driver_allocator(), gpio_b().acquire_output_pin(14));
+  return hal::v5::make_strong_ptr<decltype(gpio_a().acquire_output_pin(0))>(
+    driver_allocator(), gpio_a().acquire_output_pin(0));
 }
 
-hal::v5::strong_ptr<hal::output_pin> m2_pin()
+hal::v5::strong_ptr<hal::output_pin> step_pin()
 {
-  return hal::v5::make_strong_ptr<decltype(gpio_b().acquire_output_pin(13))>(
-    driver_allocator(), gpio_b().acquire_output_pin(13));
+  return hal::v5::make_strong_ptr<decltype(gpio_a().acquire_output_pin(15))>(
+    driver_allocator(), gpio_a().acquire_output_pin(15));
 }
 
-hal::v5::strong_ptr<hal::output_pin> m1_pin()
-{
-
-  return hal::v5::make_strong_ptr<decltype(gpio_b().acquire_output_pin(12))>(
-    driver_allocator(), gpio_b().acquire_output_pin(12));
-}
-
-hal::v5::strong_ptr<hal::output_pin> m0_pin()
+hal::v5::strong_ptr<hal::output_pin> sleep_pin()
 {
   return hal::v5::make_strong_ptr<decltype(gpio_b().acquire_output_pin(4))>(
     driver_allocator(), gpio_b().acquire_output_pin(4));
 }
 
-hal::v5::strong_ptr<hal::output_pin> step_pin()
+hal::v5::strong_ptr<hal::output_pin> enbl_pin()
 {
-  return hal::v5::make_strong_ptr<decltype(gpio_a().acquire_output_pin(8))>(
-    driver_allocator(), gpio_a().acquire_output_pin(8));
-}
-
-hal::v5::strong_ptr<hal::output_pin> enbl()
-{
-  return hal::v5::make_strong_ptr<decltype(gpio_a().acquire_output_pin(15))>(
-    driver_allocator(), gpio_a().acquire_output_pin(15));
+  return hal::v5::make_strong_ptr<decltype(gpio_b().acquire_output_pin(3))>(
+    driver_allocator(), gpio_b().acquire_output_pin(3));
 }
 
 auto& timer1()
@@ -323,7 +293,7 @@ hal::v5::strong_ptr<hal::can_identifier_filter> can_identifier_filter()
   return hal::acquire_can_identifier_filter(driver_allocator(), can_manager)[0];
 }
 
-constexpr uint16_t drill_id = 0x400;
+constexpr uint16_t drill_id = 0x141;
 hal::v5::optional_ptr<hal::actuator::rmd_drc_v2> drill_ptr;
 hal::v5::strong_ptr<hal::actuator::rmd_drc_v2> drill_motor()
 {
@@ -339,14 +309,14 @@ hal::v5::strong_ptr<hal::actuator::rmd_drc_v2> drill_motor()
     auto clock_ref = clock();
     hal::print(*console_ref, "clock initialized \n");
 
-    drill_ptr =
-      hal::v5::make_strong_ptr<hal::actuator::rmd_drc_v2>(driver_allocator(),
-                                                           *transceiver,
-                                                           *identifier_filter,
-                                                           *clock_ref,
-                                                           36.0f,
-                                                           drill_id,
-                                                           std::chrono::milliseconds(1));
+    drill_ptr = hal::v5::make_strong_ptr<hal::actuator::rmd_drc_v2>(
+      driver_allocator(),
+      *transceiver,
+      *identifier_filter,
+      *clock_ref,
+      36.0f,
+      drill_id,
+      std::chrono::milliseconds(1));
 
     hal::print(*console_ref, "drill_ptr assigned\n");
   }
@@ -356,31 +326,26 @@ hal::v5::strong_ptr<hal::actuator::rmd_drc_v2> drill_motor()
 
 // added from drive ABOVE
 
-hal::v5::optional_ptr<sjsu::drivers::drv8825> stepper_ptr;
-std::optional<hal::v5::strong_ptr<hal::output_pin>> m0_ptr; // kept at file scope so optional_ptr inside drv8825 never dangles
-std::optional<hal::v5::strong_ptr<hal::output_pin>> m1_ptr;
-std::optional<hal::v5::strong_ptr<hal::output_pin>> m2_ptr;
-hal::v5::strong_ptr<sjsu::drivers::drv8825> stepper()
- {
-    if (not stepper_ptr) {
+hal::v5::optional_ptr<sjsu::drivers::mp6500> stepper_ptr;
+hal::v5::strong_ptr<sjsu::drivers::mp6500> stepper()
+{
+  if (not stepper_ptr) {
+    auto clk = clock();
     auto dir = dir_pin();
     auto step = step_pin();
-    auto clk = clock();
-    m0_ptr = m0_pin();
-    m1_ptr = m1_pin();
-    m2_ptr = m2_pin();
-    stepper_ptr = hal::v5::make_strong_ptr<sjsu::drivers::drv8825>(
+    auto enbl = enbl_pin();
+    auto sleep = sleep_pin();
+
+    stepper_ptr = hal::v5::make_strong_ptr<sjsu::drivers::mp6500>(
       driver_allocator(),
-      sjsu::drivers::drv8825::ctor_params{
+      sjsu::drivers::mp6500::ctor_params{
         .direction_pin = dir,
         .step_pin = step,
+        .enable_pin = enbl,
+        .sleep_pin = sleep,
         .steady_clock = clk,
-        .motor_step_factor = sjsu::drivers::drv8825::step_factor::one,
-        .full_steps_per_rotation = 2048,
-        .step_half_period = hal::time_duration(100000), // using hal::time_duration(100000), 100_us was giving problems
-        .mode_pins = { *m0_ptr, *m1_ptr, *m2_ptr },
       });
-    }
+  }
   return stepper_ptr;
 }
 

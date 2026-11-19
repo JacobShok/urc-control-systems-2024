@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../../drivers/include/mp6500.hpp"
 #include <libhal-actuator/smart_servo/rmd/drc_v2.hpp>
-#include <libhal-actuator/smart_servo/rmd/mc_x_v2.hpp>
 #include <libhal-arm-mcu/stm32f1/can.hpp>
 #include <libhal-arm-mcu/stm32f1/can2.hpp>
 #include <libhal-arm-mcu/stm32f1/gpio.hpp>
@@ -24,7 +24,6 @@
 #include <libhal/timer.hpp>
 #include <libhal/usb.hpp>
 #include <libhal/zero_copy_serial.hpp>
-#include <drv8825.hpp>
 
 // Application function must be implemented by one of the compilation units
 // (.cpp) files.
@@ -39,14 +38,7 @@ hal::v5::strong_ptr<hal::can_bus_manager> can_bus_manager();
 hal::v5::strong_ptr<hal::can_identifier_filter> can_identifier_filter();
 hal::v5::strong_ptr<hal::i2c> i2c();
 hal::v5::strong_ptr<hal::actuator::rmd_drc_v2> drill_motor();
-hal::v5::strong_ptr<hal::output_pin> m0_pin();
-hal::v5::strong_ptr<hal::output_pin> m1_pin();
-hal::v5::strong_ptr<hal::output_pin> m2_pin();
-hal::v5::strong_ptr<hal::output_pin> dir_pin();
-hal::v5::strong_ptr<hal::output_pin> step_pin();
-hal::v5::strong_ptr<hal::output_pin> enbl();
-hal::v5::strong_ptr<hal::input_pin> fault();
-hal::v5::strong_ptr<sjsu::drivers::drv8825> stepper();
+hal::v5::strong_ptr<sjsu::drivers::mp6500> stepper();
 
 inline void reset()
 {

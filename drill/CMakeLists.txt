@@ -6,15 +6,14 @@ project(application LANGUAGES CXX)
 libhal_build_demos(
 
 DEMOS
-    applications
-    
+    application
+
 INCLUDES
     include
     ../drivers/include
 SOURCES
     ./src/drill_driver.cpp
-    ../drivers/src/soil_sensor_sht21.cpp
-    ../drivers/src/drv8825.cpp
+    ../drivers/src/mp6500.cpp
 
 PACKAGES
 #    libhal-__device__
